@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://c6axjqnp00hdw"]
+
+[ext_resource type="Script" uid="uid://badfkq8gisb3k" path="res://gd/inventory_slot.gd" id="1_dxvxp"]
+
+[node name="InventorySlot" type="Control" unique_id=598537909]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1088.0
+offset_bottom = -584.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dxvxp")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=87224673]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="CountLabel" type="Label" parent="." unique_id=2019593700]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1872292737]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.2509804, 1, 1, 0.22745098)

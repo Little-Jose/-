@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://dkrcph53kxaa2"]
+
+[ext_resource type="Script" uid="uid://dfweb1nfgf7mi" path="res://gd/asl_common.gd" id="1_5b0xv"]
+[ext_resource type="Texture2D" uid="uid://diq4qv6l0qnrg" path="res://Source/BgSub_屏幕截图 2026-09-27 171944.png" id="1_lsug8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_m17v8"]
+size = Vector2(388.5714, 711.4285)
+
+[node name="AslCommon" type="CharacterBody2D" unique_id=1498525702 groups=["Enemy"]]
+scale = Vector2(0.125, 0.125)
+collision_layer = 2
+collision_mask = 13
+script = ExtResource("1_5b0xv")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1051843526]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_lsug8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1623750466]
+scale = Vector2(0.35, 0.35)
+shape = SubResource("RectangleShape2D_m17v8")
+
+[node name="WallRay" type="RayCast2D" parent="." unique_id=1638643100]
+target_position = Vector2(100, 0)
+collision_mask = 4
+
+[node name="EdgeRay" type="RayCast2D" parent="." unique_id=402191745]
+position = Vector2(24, 40)
+target_position = Vector2(0, 152)
+collision_mask = 4
+
+[node name="DetectRay" type="RayCast2D" parent="." unique_id=1459926284]
+target_position = Vector2(1200, 0)
+
+[node name="Muzzle" type="Marker2D" parent="." unique_id=207498405]
+position = Vector2(0, 24)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cncynrhfxtw48"]
+
+[ext_resource type="Texture2D" uid="uid://ccpy73bux13el" path="res://Source/1315.png" id="1_d61x5"]
+[ext_resource type="Script" uid="uid://vjltvurl3i00" path="res://gd/Item.gd" id="1_livsx"]
+
+[resource]
+script = ExtResource("1_livsx")
+item_name = "子弹"
+icon = ExtResource("1_d61x5")
+description = "这个游戏目前唯一的子弹"
+value = 400
+metadata/_custom_type_script = "uid://vjltvurl3i00"

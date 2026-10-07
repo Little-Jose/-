@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://cmqs75annggcw"]
+
+[ext_resource type="Script" uid="uid://bj58p1yehgli3" path="res://main_menu.gd" id="1_l6cm7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_m17v8"]
+font_size = 70
+
+[node name="MainMenu" type="Control" unique_id=1849514419]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_l6cm7")
+
+[node name="Title" type="Label" parent="." unique_id=1935955975]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -131.0
+offset_right = 131.0
+offset_bottom = 87.0
+grow_horizontal = 2
+text = "二角洲行动"
+label_settings = SubResource("LabelSettings_m17v8")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=467762603]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -111.5
+offset_top = -86.5
+offset_right = 111.5
+offset_bottom = 86.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1408034933]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+text = "开始行动"
+
+[node name="SettingsButton" type="Button" parent="VBoxContainer" unique_id=1362884632]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+text = "设置"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=430641483]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+text = "退出游戏"

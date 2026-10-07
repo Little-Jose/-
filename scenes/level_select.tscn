@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://dr01ui7bviy3e"]
+
+[ext_resource type="Script" uid="uid://by7au8youcqdk" path="res://gd/level_select.gd" id="1_dbyaq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_m17v8"]
+font_size = 50
+outline_size = 4
+outline_color = Color(2.46543e-06, 0.61096233, 0.030646713, 1)
+shadow_size = 9
+
+[node name="LevelSelect" type="Control" unique_id=885308517]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dbyaq")
+
+[node name="Title" type="Label" parent="." unique_id=1246295625]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -427.0
+offset_right = 427.0
+offset_bottom = 153.0
+grow_horizontal = 2
+text = "战略板"
+label_settings = SubResource("LabelSettings_m17v8")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=995365948]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="CenterContainer" unique_id=713573732]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="." unique_id=840518778]
+layout_mode = 0
+offset_right = 73.0
+offset_bottom = 38.0
+text = "返回"
