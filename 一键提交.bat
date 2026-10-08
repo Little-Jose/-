@@ -4,14 +4,18 @@ echo ==========================================
 echo          正在提交并推送 Godot 项目...
 echo ==========================================
 
-:: 1. 把你修改的所有文件加入暂存区
 git add .
 
-:: 2. 提交，并自动用当前时间作为备注（这样就不用手动输入了）
-git commit -m "自动备份：%date% %time%"
+:: 如果没有修改，就跳过 commit 直接推
+git commit -m "自动备份：%date% %time%" >nul 2>&1
 
-:: 3. 推送到 GitHub
-git push
+echo 正在推送到 GitHub...
+:: 尝试推送，如果超时10秒没反应，自动重试一次
+git push -u origin main
+if %errorlevel% neq 0 (
+    echo 推送超时，正在重试...
+    git push -u origin main
+)
 
 echo.
 echo ==========================================

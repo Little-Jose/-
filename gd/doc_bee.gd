@@ -1,8 +1,10 @@
 extends CharacterBody2D
 
+# ===== 信号 =====
 signal health_changed(current: int, max_health: int)
 signal ammo_changed(current: int, max_ammo: int)
 
+# ===== 可调参数 =====
 @export var speed: float = 300.0
 @export var jump_velocity: float = -400.0
 @export var max_health: int = 3
@@ -16,9 +18,11 @@ signal ammo_changed(current: int, max_ammo: int)
 @export var mag_size: int = 30
 @export var reload_time: float = 1.5
 
+# ===== 节点引用 =====
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var muzzle: Marker2D = $Muzzle
 
+# ===== 状态 =====
 var health: int = 3
 var is_invincible: bool = false
 var facing: int = 1
@@ -27,11 +31,16 @@ var jump_buffer_timer: float = 0.0
 var fire_timer: float = 0.0
 var gravity_scale: float = 1.0
 
-# ===== 弹匣状态 =====
+# ===== 弹匣状态（旧）=====
 var current_ammo: int = 0
 var is_reloading: bool = false
 var reload_timer: float = 0.0
 
+# ===== 弹匣格数据（新）=====
+var magazine_item: Item = null    # 弹匣格里的物品，只接受子弹类
+var magazine_count: int = 0       # 弹匣格里的子弹数量
+
+# ===== 常量 =====
 const BULLET_SCENE = preload("res://scenes/player_bullet.tscn")
 const AMMO_NAME = "子弹"
 
@@ -41,7 +50,6 @@ func _ready() -> void:
 	add_to_group("player")
 	health_changed.emit(health, max_health)
 	ammo_changed.emit(current_ammo, mag_size)
-	print("开局弹匣：", current_ammo)
 
 func _physics_process(delta: float) -> void:
 	handle_gravity(delta)
@@ -50,6 +58,7 @@ func _physics_process(delta: float) -> void:
 	handle_shoot(delta)
 	move_and_slide()
 
+# ===== 重力 =====
 func handle_gravity(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * gravity_scale * delta
@@ -57,6 +66,7 @@ func handle_gravity(delta: float) -> void:
 	else:
 		coyote_timer = coyote_time
 
+# ===== 跳跃 =====
 func handle_jump(delta: float) -> void:
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_time
@@ -71,6 +81,7 @@ func handle_jump(delta: float) -> void:
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= 0.5
 
+# ===== 移动 =====
 func handle_movement(_delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 
@@ -82,6 +93,7 @@ func handle_movement(_delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
 
+# ===== 射击 =====
 func handle_shoot(delta: float) -> void:
 	if is_reloading:
 		reload_timer -= delta
@@ -106,7 +118,6 @@ func shoot() -> bool:
 		return false
 
 	current_ammo -= 1
-	print("开枪，弹匣剩：", current_ammo)
 
 	if BULLET_SCENE == null:
 		return false
@@ -120,6 +131,7 @@ func shoot() -> bool:
 	ammo_changed.emit(current_ammo, mag_size)
 	return true
 
+# ===== 换弹 =====
 func start_reload() -> void:
 	if is_reloading:
 		return
@@ -129,7 +141,6 @@ func start_reload() -> void:
 	reload_timer = reload_time
 
 func finish_reload() -> void:
-	print("换弹完成，补弹前弹匣：", current_ammo)
 	is_reloading = false
 
 	var need = mag_size - current_ammo
@@ -142,15 +153,14 @@ func finish_reload() -> void:
 	var to_load = min(need, available)
 
 	if to_load <= 0:
-		print("没有可补的子弹")
 		return
 
 	Inventory.remove_item(AMMO_NAME, to_load)
 	current_ammo += to_load
 
-	print("换弹完成，补弹后弹匣：", current_ammo)
 	ammo_changed.emit(current_ammo, mag_size)
 
+# ===== 受伤 =====
 func take_damage(amount: int = 1) -> void:
 	if is_invincible:
 		return
@@ -171,6 +181,46 @@ func take_damage(amount: int = 1) -> void:
 	if health <= 0:
 		die()
 
+# ===== 死亡 =====
 func die() -> void:
-	print("玩家死亡")
-	queue_free()
+	get_tree().paused = true
+
+	var canvas = CanvasLayer.new()
+	get_tree().current_scene.add_child(canvas)
+
+	var screen = load("res://scenes/result_screen.tscn").instantiate()
+	canvas.add_child(screen)
+	screen.setup(false, "res://scenes/level_0.tscn")
+
+# ===== 弹匣格操作 =====
+# 往弹匣格里加子弹，返回实际加进去的数量
+func add_to_magazine(item: Item, amount: int) -> int:
+	if item == null or item.item_type != "ammo":
+		return 0
+
+	if magazine_item == null:
+		magazine_item = item
+	elif magazine_item.item_name != item.item_name:
+		return 0
+
+	var space = mag_size - magazine_count
+	var to_add = min(space, amount)
+	magazine_count += to_add
+	ammo_changed.emit(magazine_count, mag_size)
+	return to_add
+
+# 从弹匣格取走子弹，返回实际取走的数量
+func remove_from_magazine(amount: int) -> int:
+	var to_remove = min(magazine_count, amount)
+	magazine_count -= to_remove
+	if magazine_count <= 0:
+		magazine_item = null
+		magazine_count = 0
+	ammo_changed.emit(magazine_count, mag_size)
+	return to_remove
+
+# 清空弹匣格
+func clear_magazine() -> void:
+	magazine_item = null
+	magazine_count = 0
+	ammo_changed.emit(magazine_count, mag_size)

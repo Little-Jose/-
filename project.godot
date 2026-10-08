@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="二角洲行动"
-run/main_scene="uid://dr01ui7bviy3e"
+run/main_scene="uid://cmqs75annggcw"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]

@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var inventory_ui: Control = $InventoryUI
 @onready var container_ui: Control = $ContainerUI
 @onready var pause_menu: Control = $PauseMenu
+@onready var extraction_label: Label = $ExtractionLabel
 
 func _ready() -> void:
 	await get_tree().process_frame
@@ -20,6 +21,7 @@ func _ready() -> void:
 	inventory_ui.visible = false
 	container_ui.visible = false
 	pause_menu.visible = false
+	extraction_label.visible = false
 
 	$PauseMenu/VBoxContainer/ResumeButton.pressed.connect(resume_game)
 	$PauseMenu/VBoxContainer/MenuButton.pressed.connect(go_to_main_menu)
@@ -72,3 +74,29 @@ func open_container(inv: Inventory) -> void:
 func close_container() -> void:
 	container_ui.hide_inventory()
 	inventory_ui.visible = false
+
+# ===== 撤离倒计时 =====
+func show_extraction_timer(total_time: float) -> void:
+	extraction_label.visible = true
+	extraction_label.text = "等待撤离"
+
+func update_extraction_timer(remain: float) -> void:
+	var seconds = int(ceil(remain))
+	extraction_label.text = "等待撤离\n%d" % max(seconds, 0)
+
+func hide_extraction_timer() -> void:
+	extraction_label.visible = false
+
+func on_extraction_success() -> void:
+	get_tree().paused = true
+
+	var total_value = 0
+	for slot in Inventory.items:
+		if slot.item != null:
+			total_value += slot.item.value * slot.count
+
+	var canvas = CanvasLayer.new()
+	get_tree().current_scene.add_child(canvas)
+	var screen = load("res://scenes/result_screen.tscn").instantiate()
+	canvas.add_child(screen)
+	screen.setup(true, "res://scenes/level_0.tscn", total_value)

@@ -56,3 +56,23 @@ offset_bottom = 37.0
 grow_horizontal = 0
 label_settings = SubResource("LabelSettings_5ysmq")
 vertical_alignment = 2
+
+[node name="MagazineSlot" type="Control" parent="Panel" unique_id=1264053419]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Background" type="ColorRect" parent="Panel/MagazineSlot" unique_id=363316451]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Icon" type="TextureRect" parent="Panel/MagazineSlot" unique_id=1975433696]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CountLabel" type="Label" parent="Panel/MagazineSlot" unique_id=1123427961]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

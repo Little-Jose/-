@@ -6,3 +6,4 @@ class_name Item
 @export var max_stack: int = 60
 @export var description: String = ""
 @export var value: int = 0
+@export var item_type: String = "misc"   # 物品类型：ammo / medkit / keycard ...

@@ -9,4 +9,5 @@ item_name = "子弹"
 icon = ExtResource("1_d61x5")
 description = "这个游戏目前唯一的子弹"
 value = 400
+item_type = "ammo"
 metadata/_custom_type_script = "uid://vjltvurl3i00"

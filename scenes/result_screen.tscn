@@ -1,9 +1,78 @@
-[gd_scene format=3 uid="uid://c663uhu45vg2q"]
+[gd_scene format=3 uid="uid://dei2qkh8lk6o7"]
 
-[node name="ResultScreen" type="Control" unique_id=326197790]
+[ext_resource type="Script" uid="uid://g2sgx4bcexke" path="res://result_screen.gd" id="1_y7kih"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_y7kih"]
+font_size = 24
+
+[node name="ResultScreen" type="Control" unique_id=674685352]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_y7kih")
+
+[node name="BackGround" type="ColorRect" parent="." unique_id=1676894498]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.39215687)
+
+[node name="ValueLabel" type="Label" parent="." unique_id=1950612621]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -184.0
+offset_top = -210.0
+offset_right = 184.0
+offset_bottom = -176.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
+text = "测试文本"
+label_settings = SubResource("LabelSettings_y7kih")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="." unique_id=389029214]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -224.0
+offset_right = 224.0
+offset_bottom = 128.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 60
+text = "行动失败"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MenuButton" type="Button" parent="." unique_id=1353389017]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 0
+offset_left = 392.0
+offset_top = 354.0
+offset_right = 760.0
+offset_bottom = 434.0
+theme_override_font_sizes/font_size = 40
+text = "返回主菜单"
+
+[node name="RetryButton" type="Button" parent="." unique_id=1578649748]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 0
+offset_left = 392.0
+offset_top = 214.0
+offset_right = 760.0
+offset_bottom = 294.0
+theme_override_font_sizes/font_size = 40
+text = "重试"
