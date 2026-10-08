@@ -8,20 +8,20 @@ var count: int = 0
 var source_inventory: Inventory = null
 var slot_index: int = -1
 
-# 点选选中记录
+# ===== 点选选中记录 =====
 static var selected_slot: Control = null
 
-# 手动拖拽状态
+# ===== 手动拖拽状态 =====
 static var dragging_slot: Control = null
 static var drag_preview: Control = null
 
-# 拖拽起始检测
+# ===== 拖拽起始检测 =====
 var press_position: Vector2 = Vector2.ZERO
 var is_pressing: bool = false
 var is_dragging: bool = false
 const DRAG_THRESHOLD := 8.0
 
-# 双击检测
+# ===== 双击检测 =====
 var last_click_time: float = 0.0
 const DOUBLE_CLICK_TIME := 0.3
 
@@ -33,14 +33,9 @@ func setup(new_item: Item, new_count: int, inv: Inventory, index: int) -> void:
 	icon.texture = item.icon if item else null
 	count_label.text = str(count) if count > 1 else ""
 	custom_minimum_size = Vector2(64, 64)
-	size = Vector2(64, 64)
 
 	if item:
-		tooltip_text = "%s\n%s\n单价: %d" % [
-			item.item_name,
-			item.description,
-			item.value
-		]
+		tooltip_text = "%s\n%s\n单价: %d" % [item.item_name, item.description, item.value]
 	else:
 		tooltip_text = ""
 
@@ -52,10 +47,9 @@ func setup_empty(inv: Inventory, index: int) -> void:
 	icon.texture = null
 	count_label.text = ""
 	custom_minimum_size = Vector2(64, 64)
-	size = Vector2(64, 64)
 	tooltip_text = ""
 
-# ===== 鼠标按下（只处理按下）=====
+# ===== 鼠标按下 =====
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
@@ -71,9 +65,8 @@ func _gui_input(event):
 			is_pressing = true
 			is_dragging = false
 
-# ===== 全局输入：松手 + 拖拽检测 =====
+# ===== 全局输入：松手 + 拖拽 =====
 func _input(event):
-	# 松手：不管鼠标在哪都能收到
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 		if is_pressing:
 			if is_dragging:
@@ -85,7 +78,6 @@ func _input(event):
 			is_pressing = false
 			is_dragging = false
 
-	# 鼠标移动：启动拖拽
 	if event is InputEventMouseMotion and is_pressing and not is_dragging:
 		if item == null:
 			return
@@ -172,11 +164,54 @@ func remove_drag_preview():
 
 # ===== 放下 =====
 func attempt_drop():
+	# 1. 先看鼠标下是不是弹匣格
+	var mag_slot = find_magazine_slot_under_mouse()
+	if mag_slot != null:
+		if item == null or item.item_type != "ammo":
+			return
+		var player = get_tree().get_first_node_in_group("player")
+		if player == null:
+			return
+
+		var space = player.mag_size - player.magazine_count
+		var to_add = min(space, count)
+		if to_add <= 0:
+			return
+
+		var removed = source_inventory.remove_at(slot_index, to_add)
+		if removed <= 0:
+			return
+
+		player.add_to_magazine(item, removed)
+		refresh_all_uis()
+		return
+
+	# 2. 看鼠标下是不是背包格
 	var target = find_slot_under_mouse()
 	if target == null or target == self:
 		return
 	swap_with(target)
 
+# ===== 找鼠标下的弹匣格 =====
+func find_magazine_slot_under_mouse():
+	var mouse_pos = get_global_mouse_position()
+	var main_loop = Engine.get_main_loop()
+	if main_loop == null:
+		return null
+	var scene = main_loop.current_scene
+	if scene == null:
+		return null
+	var hud = scene.get_node_or_null("HUD")
+	if hud == null:
+		return null
+
+	# MagazineSlot 挂在 Panel 下面
+	var mag_slot = hud.inventory_ui.get_node_or_null("Panel/MagazineSlot")
+	if mag_slot != null and mag_slot.get_global_rect().has_point(mouse_pos):
+		return mag_slot
+	return null
+
+# ===== 找鼠标下的背包格 =====
 func find_slot_under_mouse():
 	var mouse_pos = get_global_mouse_position()
 	var main_loop = Engine.get_main_loop()
@@ -204,14 +239,12 @@ func swap_with(other: Control):
 	if source_inventory == null or other.source_inventory == null:
 		return
 
-	# 情况 1：对方格子是空的 → 直接移过去
 	if other.item == null:
 		other.source_inventory.set_slot(other.slot_index, item, count)
 		source_inventory.set_slot(slot_index, null, 0)
 		refresh_all_uis()
 		return
 
-	# 情况 2：同类物品 → 合并
 	if item != null and item.item_name == other.item.item_name:
 		var space = other.item.max_stack - other.count
 		var to_add = min(space, count)
@@ -222,7 +255,6 @@ func swap_with(other: Control):
 		refresh_all_uis()
 		return
 
-	# 情况 3：不同物品 → 交换
 	var my_item = item
 	var my_count = count
 	source_inventory.set_slot(slot_index, other.item, other.count)

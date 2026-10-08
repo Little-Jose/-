@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://decmkx6b3mmok"]
 
 [ext_resource type="Script" uid="uid://bvwy3i32htvaw" path="res://gd/inventory_ui.gd" id="1_tahbm"]
+[ext_resource type="Script" uid="uid://1oi8o5lgaqjg" path="res://gd/magazine_slot.gd" id="2_ylkvr"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_aa0gv"]
 font_size = 44
@@ -59,20 +60,41 @@ vertical_alignment = 2
 
 [node name="MagazineSlot" type="Control" parent="Panel" unique_id=1264053419]
 anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = -65.0
+offset_right = -1.0
+offset_bottom = 64.0
+script = ExtResource("2_ylkvr")
 
 [node name="Background" type="ColorRect" parent="Panel/MagazineSlot" unique_id=363316451]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+modulate = Color(0.5254902, 0, 0, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0.21176471)
 
 [node name="Icon" type="TextureRect" parent="Panel/MagazineSlot" unique_id=1975433696]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
 
 [node name="CountLabel" type="Label" parent="Panel/MagazineSlot" unique_id=1123427961]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+horizontal_alignment = 2
+vertical_alignment = 2

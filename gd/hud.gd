@@ -1,5 +1,6 @@
 extends CanvasLayer
 
+# ===== 节点引用 =====
 @onready var health_label: Label = $HealthLabel
 @onready var ammo_label: Label = $AmmoLabel
 @onready var inventory_ui: Control = $InventoryUI
@@ -14,7 +15,7 @@ func _ready() -> void:
 		player.health_changed.connect(update_health)
 		player.ammo_changed.connect(update_ammo)
 		update_health(player.health, player.max_health)
-		update_ammo(player.current_ammo, player.mag_size)
+		update_ammo(player.magazine_count, player.mag_size)
 
 	Inventory.inventory_changed.connect(_on_inventory_changed)
 
@@ -35,20 +36,6 @@ func _input(event):
 		if inventory_ui.visible:
 			inventory_ui.refresh()
 
-# ===== 暂停 =====
-func toggle_pause() -> void:
-	var paused = not get_tree().paused
-	get_tree().paused = paused
-	pause_menu.visible = paused
-
-func resume_game() -> void:
-	get_tree().paused = false
-	pause_menu.visible = false
-
-func go_to_main_menu() -> void:
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
-
 # ===== 血量与弹药 =====
 func update_health(current: int, max_health: int) -> void:
 	health_label.text = "HP: %d / %d" % [current, max_health]
@@ -63,7 +50,7 @@ func update_ammo(current: int, max_ammo: int) -> void:
 func _on_inventory_changed() -> void:
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
-		update_ammo(player.current_ammo, player.mag_size)
+		update_ammo(player.magazine_count, player.mag_size)
 
 # ===== 容器 =====
 func open_container(inv: Inventory) -> void:
@@ -75,25 +62,45 @@ func close_container() -> void:
 	container_ui.hide_inventory()
 	inventory_ui.visible = false
 
+# ===== 暂停 =====
+func toggle_pause() -> void:
+	var paused = not get_tree().paused
+	get_tree().paused = paused
+	pause_menu.visible = paused
+
+func resume_game() -> void:
+	get_tree().paused = false
+	pause_menu.visible = false
+
+func go_to_main_menu() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
 # ===== 撤离倒计时 =====
-func show_extraction_timer(total_time: float) -> void:
+func show_extraction_timer(_total_time: float) -> void:
 	extraction_label.visible = true
-	extraction_label.text = "等待撤离"
+	extraction_label.text = "等待撤离..."
 
 func update_extraction_timer(remain: float) -> void:
 	var seconds = int(ceil(remain))
-	extraction_label.text = "等待撤离\n%d" % max(seconds, 0)
+	extraction_label.text = "等待撤离...\n%d" % max(seconds, 0)
 
 func hide_extraction_timer() -> void:
 	extraction_label.visible = false
 
+# ===== 撤离成功 =====
 func on_extraction_success() -> void:
 	get_tree().paused = true
 
+	# 算背包 + 弹匣格的总价值
 	var total_value = 0
 	for slot in Inventory.items:
 		if slot.item != null:
 			total_value += slot.item.value * slot.count
+
+	var player = get_tree().get_first_node_in_group("player")
+	if player != null and player.magazine_item != null:
+		total_value += player.magazine_item.value * player.magazine_count
 
 	var canvas = CanvasLayer.new()
 	get_tree().current_scene.add_child(canvas)

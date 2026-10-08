@@ -31,14 +31,13 @@ var jump_buffer_timer: float = 0.0
 var fire_timer: float = 0.0
 var gravity_scale: float = 1.0
 
-# ===== 弹匣状态（旧）=====
-var current_ammo: int = 0
+# ===== 弹匣格数据 =====
+var magazine_item: Item = null    # 弹匣格里的物品（只接受子弹）
+var magazine_count: int = 0       # 弹匣格里的子弹数量
+
+# ===== 换弹状态 =====
 var is_reloading: bool = false
 var reload_timer: float = 0.0
-
-# ===== 弹匣格数据（新）=====
-var magazine_item: Item = null    # 弹匣格里的物品，只接受子弹类
-var magazine_count: int = 0       # 弹匣格里的子弹数量
 
 # ===== 常量 =====
 const BULLET_SCENE = preload("res://scenes/player_bullet.tscn")
@@ -46,10 +45,11 @@ const AMMO_NAME = "子弹"
 
 func _ready() -> void:
 	health = max_health
-	current_ammo = 0
+	magazine_item = null
+	magazine_count = 0
 	add_to_group("player")
 	health_changed.emit(health, max_health)
-	ammo_changed.emit(current_ammo, mag_size)
+	ammo_changed.emit(magazine_count, mag_size)
 
 func _physics_process(delta: float) -> void:
 	handle_gravity(delta)
@@ -95,29 +95,33 @@ func handle_movement(_delta: float) -> void:
 
 # ===== 射击 =====
 func handle_shoot(delta: float) -> void:
+	# 换弹中，不处理射击
 	if is_reloading:
 		reload_timer -= delta
 		if reload_timer <= 0:
 			finish_reload()
 		return
 
+	# 按 R 手动换弹
 	if Input.is_action_just_pressed("reload") and not is_reloading:
 		start_reload()
 		return
 
+	# 射击冷却
 	fire_timer -= delta
 	if Input.is_action_pressed("shoot") and fire_timer <= 0:
 		if shoot():
 			fire_timer = fire_rate
 
-	if current_ammo <= 0 and not is_reloading:
+	# 弹匣空了自动换弹（只从玩家背包取子弹）
+	if magazine_count <= 0 and not is_reloading:
 		start_reload()
 
 func shoot() -> bool:
-	if current_ammo <= 0:
+	if magazine_count <= 0:
 		return false
 
-	current_ammo -= 1
+	remove_from_magazine(1)
 
 	if BULLET_SCENE == null:
 		return false
@@ -127,14 +131,13 @@ func shoot() -> bool:
 	if bullet.has_method("set_direction"):
 		bullet.set_direction(facing)
 	get_tree().current_scene.add_child(bullet)
-
-	ammo_changed.emit(current_ammo, mag_size)
 	return true
 
 # ===== 换弹 =====
 func start_reload() -> void:
 	if is_reloading:
 		return
+	# 只检查玩家背包
 	if not Inventory.has_item(AMMO_NAME, 1):
 		return
 	is_reloading = true
@@ -143,22 +146,30 @@ func start_reload() -> void:
 func finish_reload() -> void:
 	is_reloading = false
 
-	var need = mag_size - current_ammo
+	var need = mag_size - magazine_count
+	if need <= 0:
+		return
 
+	# 只从玩家背包统计
 	var available = 0
+	var ammo_template = null
 	for slot in Inventory.items:
 		if slot.item != null and slot.item.item_name == AMMO_NAME:
 			available += slot.count
+			if ammo_template == null:
+				ammo_template = slot.item
 
 	var to_load = min(need, available)
-
 	if to_load <= 0:
 		return
 
+	# 只从玩家背包扣除
 	Inventory.remove_item(AMMO_NAME, to_load)
-	current_ammo += to_load
 
-	ammo_changed.emit(current_ammo, mag_size)
+	# 加进弹匣格
+	if magazine_item == null:
+		magazine_item = ammo_template
+	add_to_magazine(magazine_item, to_load)
 
 # ===== 受伤 =====
 func take_damage(amount: int = 1) -> void:
@@ -193,7 +204,6 @@ func die() -> void:
 	screen.setup(false, "res://scenes/level_0.tscn")
 
 # ===== 弹匣格操作 =====
-# 往弹匣格里加子弹，返回实际加进去的数量
 func add_to_magazine(item: Item, amount: int) -> int:
 	if item == null or item.item_type != "ammo":
 		return 0
@@ -209,7 +219,6 @@ func add_to_magazine(item: Item, amount: int) -> int:
 	ammo_changed.emit(magazine_count, mag_size)
 	return to_add
 
-# 从弹匣格取走子弹，返回实际取走的数量
 func remove_from_magazine(amount: int) -> int:
 	var to_remove = min(magazine_count, amount)
 	magazine_count -= to_remove
@@ -219,7 +228,6 @@ func remove_from_magazine(amount: int) -> int:
 	ammo_changed.emit(magazine_count, mag_size)
 	return to_remove
 
-# 清空弹匣格
 func clear_magazine() -> void:
 	magazine_item = null
 	magazine_count = 0
