@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://v5mpwx0w7syn"]
 
 [ext_resource type="Script" uid="uid://cfjkbjhimbm5g" path="res://gd/extraction_point.gd" id="1_pvd43"]
+[ext_resource type="Texture2D" uid="uid://cxfmt0merut2k" path="res://Source/屏幕截图 2026-10-09 093839.png" id="2_tf5yc"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m17v8"]
 
@@ -8,6 +9,10 @@
 script = ExtResource("1_pvd43")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=395625969]
+modulate = Color(1, 1, 1, 0.3529412)
+position = Vector2(0, 3.33786e-06)
+scale = Vector2(0.13869625, 0.13642566)
+texture = ExtResource("2_tf5yc")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=262257110]
 scale = Vector2(5, 5)

@@ -32,12 +32,15 @@ var fire_timer: float = 0.0
 var gravity_scale: float = 1.0
 
 # ===== 弹匣格数据 =====
-var magazine_item: Item = null    # 弹匣格里的物品（只接受子弹）
-var magazine_count: int = 0       # 弹匣格里的子弹数量
+var magazine_item: Item = null
+var magazine_count: int = 0
 
 # ===== 换弹状态 =====
 var is_reloading: bool = false
 var reload_timer: float = 0.0
+
+# ===== 临时：安全位置记录，正式版删除 =====
+var last_safe_position: Vector2 = Vector2.ZERO
 
 # ===== 常量 =====
 const BULLET_SCENE = preload("res://scenes/player_bullet.tscn")
@@ -47,6 +50,7 @@ func _ready() -> void:
 	health = max_health
 	magazine_item = null
 	magazine_count = 0
+	last_safe_position = global_position
 	add_to_group("player")
 	health_changed.emit(health, max_health)
 	ammo_changed.emit(magazine_count, mag_size)
@@ -57,6 +61,14 @@ func _physics_process(delta: float) -> void:
 	handle_movement(delta)
 	handle_shoot(delta)
 	move_and_slide()
+
+	# ===== 临时：安全位置记录与掉落传送，正式版删除 =====
+	if is_on_floor():
+		last_safe_position = global_position
+
+	if global_position.y > 1000.0:
+		global_position = last_safe_position
+		velocity = Vector2.ZERO
 
 # ===== 重力 =====
 func handle_gravity(delta: float) -> void:
@@ -95,25 +107,21 @@ func handle_movement(_delta: float) -> void:
 
 # ===== 射击 =====
 func handle_shoot(delta: float) -> void:
-	# 换弹中，不处理射击
 	if is_reloading:
 		reload_timer -= delta
 		if reload_timer <= 0:
 			finish_reload()
 		return
 
-	# 按 R 手动换弹
 	if Input.is_action_just_pressed("reload") and not is_reloading:
 		start_reload()
 		return
 
-	# 射击冷却
 	fire_timer -= delta
 	if Input.is_action_pressed("shoot") and fire_timer <= 0:
 		if shoot():
 			fire_timer = fire_rate
 
-	# 弹匣空了自动换弹（只从玩家背包取子弹）
 	if magazine_count <= 0 and not is_reloading:
 		start_reload()
 
@@ -137,7 +145,6 @@ func shoot() -> bool:
 func start_reload() -> void:
 	if is_reloading:
 		return
-	# 只检查玩家背包
 	if not Inventory.has_item(AMMO_NAME, 1):
 		return
 	is_reloading = true
@@ -150,7 +157,6 @@ func finish_reload() -> void:
 	if need <= 0:
 		return
 
-	# 只从玩家背包统计
 	var available = 0
 	var ammo_template = null
 	for slot in Inventory.items:
@@ -163,10 +169,8 @@ func finish_reload() -> void:
 	if to_load <= 0:
 		return
 
-	# 只从玩家背包扣除
 	Inventory.remove_item(AMMO_NAME, to_load)
 
-	# 加进弹匣格
 	if magazine_item == null:
 		magazine_item = ammo_template
 	add_to_magazine(magazine_item, to_load)

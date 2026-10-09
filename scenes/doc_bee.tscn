@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://b0wumfxkf8qm5" path="res://Source/e0509bfa7bc34477840c2f713a56a495.png" id="2_5q1c1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_m17v8"]
-size = Vector2(312, 508)
+size = Vector2(144, 508)
 
 [node name="DocBee" type="CharacterBody2D" unique_id=1153273561 groups=["Player"]]
 scale = Vector2(-0.125, 0.125)
@@ -19,7 +19,7 @@ scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_5q1c1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=29434526]
-position = Vector2(0, -1)
+position = Vector2(4, -1)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("RectangleShape2D_m17v8")
 

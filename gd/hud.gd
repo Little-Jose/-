@@ -79,11 +79,11 @@ func go_to_main_menu() -> void:
 # ===== 撤离倒计时 =====
 func show_extraction_timer(_total_time: float) -> void:
 	extraction_label.visible = true
-	extraction_label.text = "等待撤离..."
+	extraction_label.text = "等待撤离"
 
 func update_extraction_timer(remain: float) -> void:
 	var seconds = int(ceil(remain))
-	extraction_label.text = "等待撤离...\n%d" % max(seconds, 0)
+	extraction_label.text = "等待撤离\n%d" % max(seconds, 0)
 
 func hide_extraction_timer() -> void:
 	extraction_label.visible = false
